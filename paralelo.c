@@ -56,13 +56,14 @@ int* bucket_sort(int* array, int nelem, int nbuckets, int limit){
 
 
 	//Colocar no array final de acordo com o bucket
+	//Ordenação de cada bucketse	
 	for (i = 0; i < nelem ; i++){
 		b = array[i] * nbuckets / limit; //Calcula o bucket a ser ulilizado
 		new[buckets[b].index] = array[i];  //Insere no bucket
 		buckets[b].index++;	
 	}
-
 	//Ordenação de cada bucket
+	#pragma omp parallel for
 	for(i = 0; i < nbuckets; i++)
 		qsort(&new[buckets[i].start],buckets[i].size, sizeof(int), cmpfunc);
 
