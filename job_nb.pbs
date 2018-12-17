@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+#PBS -N teste_bs_nb
+#PBS -l walltime=60:00
+#PBS -l nodes=1:r652:ppn=40
+#PBS -q cpar
+
+module load gcc/5.3.0
+gcc -O3 -std=c99 -fopenmp -lm CParalela1819/paralelo.c -o bucket_par
+gcc -O3 -std=c99 -fopenmp -lm CParalela1819/sequencial.c -o bucket_seq
+
+rm teste_bs_nb.*
+> seq_nb.csv
+> par_nb.csv
+
+for size in 3000 30000 300000 3000000 30000000
+do
+    for n_buckets in 2 4 8 16 32 64 128 256 512 1024
+    do
+        ./bucket_seq $size $n_buckets >> seq_nb.csv
+        export OMP_NUM_THREADS=32
+        ./bucket_par $size $n_buckets >> par_nb.csv
+    done
+    echo "\n" >> par_nb.csv
+    echo "\n" >> seq_nb.csv 
+done

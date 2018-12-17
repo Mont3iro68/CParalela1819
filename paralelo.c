@@ -3,7 +3,7 @@
 #include <time.h>
 #include <omp.h>
 
-
+#define TIMER 1000000
 
 typedef struct bucket{
 	int size;  //Tamanho do bucket
@@ -34,7 +34,7 @@ void clear_cache() {
 
 int* bucket_sort(int* array, int nelem, int nbuckets, int limit){
 
-	int *new = calloc(nelem,sizeof(int)); //Criação do array a ser ordenado
+	int *new = calloc(nelem,sizeof(int));  		 //Criação do array a ser ordenado
 	Bucket buckets = calloc(nbuckets,sizeof(struct bucket)); //Criação dos buckets
 
 	int i,b;
@@ -56,17 +56,18 @@ int* bucket_sort(int* array, int nelem, int nbuckets, int limit){
 
 
 	//Colocar no array final de acordo com o bucket
-	//Ordenação de cada bucketse	
+
 	for (i = 0; i < nelem ; i++){
 		b = array[i] * nbuckets / limit; //Calcula o bucket a ser ulilizado
 		new[buckets[b].index] = array[i];  //Insere no bucket
 		buckets[b].index++;	
 	}
-	//Ordenação de cada bucket
+
+	
+	//Ordenação de cada bucket	
 	#pragma omp parallel for
 	for(i = 0; i < nbuckets; i++)
 		qsort(&new[buckets[i].start],buckets[i].size, sizeof(int), cmpfunc);
-
 	return new;
 }
 
@@ -80,12 +81,13 @@ int main (int argc, char const ** argv){
 		
 
 		for(i = 0; i< array_size; i++){
-			unsorted[i] = (int) random() % 500;
+			unsorted[i] = (int) random() % 99999;
 		}
 		clear_cache();
-		t = omp_get_wtime();
-		sorted = bucket_sort(unsorted,array_size,atoi(argv[2]),501);
-		time[n_iter] = omp_get_wtime() - t;
+		t = omp_get_wtime() * TIMER;
+		sorted = bucket_sort(unsorted,array_size,atoi(argv[2]),100000);
+		time[n_iter] = omp_get_wtime() * TIMER;
+		time[n_iter] -= t;
 		for (i=0; i < array_size-1; i++) {
             if (sorted[i] > sorted[i+1]) 
                 ord = 0;

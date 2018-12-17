@@ -3,7 +3,7 @@
 #include <time.h>
 #include <omp.h>
 
-
+#define TIMER 1000000
 
 typedef struct bucket{
 	int size;  //Tamanho do bucket
@@ -79,12 +79,13 @@ int main (int argc, char const ** argv){
 		
 
 		for(i = 0; i< array_size; i++){
-			unsorted[i] = (int) random() % 500;
+			unsorted[i] = (int) random() % 99999;
 		}
 		clear_cache();
-		t = omp_get_wtime();
-		sorted = bucket_sort(unsorted,array_size,atoi(argv[2]),501);
-		time[n_iter] = omp_get_wtime() - t;
+		t = omp_get_wtime() * TIMER;
+		sorted = bucket_sort(unsorted,array_size,atoi(argv[2]),100000);
+		time[n_iter] = omp_get_wtime() * TIMER;
+		time[n_iter] -= t;
 		for (i=0; i < array_size-1; i++) {
             if (sorted[i] > sorted[i+1]) 
                 ord = 0;
